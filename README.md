@@ -1,6 +1,6 @@
 shellenv
 ------------------------------
-Print evaluated variables in shell export instructons.
+Print evaluated variables in shell export instructions.
 
 This allows sharing environment variables between shells.
 
@@ -30,7 +30,7 @@ For Bash shell, add the following to `~/.bashrc`
 ```
 source <("${HOME}/.local/bin/shellenv" --format bash "${HOME}/.config/shellenv/env")
 ```
-For Dash shell, use `eval "$(...))` to source the output command (untested).
+For Dash shell, use `eval "$(...))"` to source the output command (untested).
 
 See `shellenv --help` for available options.
 
