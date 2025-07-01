@@ -1,5 +1,6 @@
-use std::env;
+use std::io::Read;
 use std::rc::Rc;
+use std::{env, io::IsTerminal};
 
 use std::collections::HashMap;
 
@@ -173,15 +174,30 @@ fn dedupe_path(value: &str) -> Option<String> {
     }
 }
 
+fn try_stdin(res: &mut Vec<String>) {
+    let stdin = std::io::stdin();
+
+    if stdin.is_terminal() {
+        return;
+    }
+
+    let mut buf = String::new();
+    let mut handle = stdin.lock();
+
+    handle.read_to_string(&mut buf).unwrap();
+
+    res.push(buf);
+}
+
 fn main() -> Result<(), String> {
     let args = Cli::parse();
     if args.verbose > 0 {
         eprintln!("{args:?}");
     }
 
-    if args.files.len() == 0 {
-        return Err("No files were specified.".to_owned());
-    }
+    // if args.files.len() == 0 {
+    //     return Err("No files were specified.".to_owned());
+    // }
 
     let mut env = Environ::new();
 
@@ -191,6 +207,9 @@ fn main() -> Result<(), String> {
 
     let file_contents = {
         let mut res = Vec::with_capacity(args.files.len());
+
+        try_stdin(&mut res);
+
         for file in &args.files {
             res.push(std::fs::read_to_string(file).unwrap())
         }
