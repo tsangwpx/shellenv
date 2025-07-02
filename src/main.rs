@@ -167,11 +167,7 @@ fn dedupe_path(value: &str) -> Option<String> {
         }
     }
 
-    if work != value {
-        Some(work)
-    } else {
-        None
-    }
+    if work != value { Some(work) } else { None }
 }
 
 fn try_stdin(res: &mut Vec<String>) {

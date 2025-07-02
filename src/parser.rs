@@ -1,6 +1,7 @@
 use std::ops::{RangeFrom, RangeTo};
 
 use nom::{
+    AsChar, Compare, FindToken, IResult, InputIter, InputLength, InputTake, Offset, Slice,
     branch::alt,
     bytes::complete::{escaped_transform, is_not, tag, take_till},
     character::complete::{alpha1, alphanumeric1, multispace1, none_of, one_of},
@@ -8,7 +9,6 @@ use nom::{
     error::ParseError,
     multi::{fold_many0, many0_count},
     sequence::{delimited, pair, preceded, separated_pair, tuple},
-    AsChar, Compare, FindToken, IResult, InputIter, InputLength, InputTake, Offset, Slice,
 };
 
 /*
@@ -274,10 +274,10 @@ pub(crate) fn parse(input: &str) -> IResult<&str, Option<(&str, Expr)>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parser::parse_expansion;
     use crate::parser::Expansion;
     use crate::parser::ExpansionKind;
     use crate::parser::Expr;
+    use crate::parser::parse_expansion;
 
     #[test]
     fn expansion_simple() {
