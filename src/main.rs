@@ -1,6 +1,6 @@
+use std::env;
 use std::io::Read;
 use std::rc::Rc;
-use std::{env, io::IsTerminal};
 
 use std::collections::HashMap;
 
@@ -170,19 +170,13 @@ fn dedupe_path(value: &str) -> Option<String> {
     if work != value { Some(work) } else { None }
 }
 
-fn try_stdin(res: &mut Vec<String>) {
+fn read_stdin() -> Result<String, std::io::Error> {
     let stdin = std::io::stdin();
-
-    if stdin.is_terminal() {
-        return;
-    }
 
     let mut buf = String::new();
     let mut handle = stdin.lock();
 
-    handle.read_to_string(&mut buf).unwrap();
-
-    res.push(buf);
+    handle.read_to_string(&mut buf).and_then(|_| Ok(buf))
 }
 
 fn main() -> Result<(), String> {
@@ -204,10 +198,18 @@ fn main() -> Result<(), String> {
     let file_contents = {
         let mut res = Vec::with_capacity(args.files.len());
 
-        try_stdin(&mut res);
-
-        for file in &args.files {
-            res.push(std::fs::read_to_string(file).unwrap())
+        if args.files.is_empty() {
+            if let Ok(buf) = read_stdin() {
+                res.push(buf);
+            }
+        } else {
+            for file in &args.files {
+                if file == "-" {
+                    res.push(read_stdin().unwrap());
+                } else {
+                    res.push(std::fs::read_to_string(file).unwrap());
+                }
+            }
         }
 
         res
